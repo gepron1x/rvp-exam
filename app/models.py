@@ -1,28 +1,12 @@
 import os
-from typing import Optional, Union, List
+from typing import Optional, List
 from datetime import datetime
-import sqlalchemy as sa
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
-from flask import url_for
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeignKey, Text, Integer, MetaData, Table, Column
+from sqlalchemy import String, ForeignKey, Text, Integer, Table, Column
 
-
-class Base(DeclarativeBase):
-  metadata = MetaData(naming_convention={
-        "ix": 'ix_%(column_0_label)s',
-        "uq": "uq_%(table_name)s_%(column_0_name)s",
-        "ck": "ck_%(table_name)s_%(constraint_name)s",
-        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-        "pk": "pk_%(table_name)s"
-    })
-
-db = SQLAlchemy(model_class=Base)
-
-
+from .extensions import db
 class Role(db.Model):
     __tablename__ = 'roles'
 
@@ -113,8 +97,8 @@ class Review(db.Model):
     text: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    book_id: Mapped[int] = mapped_column(ForeignKey("books.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    book_id: Mapped[int] = mapped_column(ForeignKey("books.id", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     book: Mapped["Book"] = relationship()
     user: Mapped["User"] = relationship()

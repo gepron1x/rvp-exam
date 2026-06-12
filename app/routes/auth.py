@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import LoginManager, login_user, logout_user, login_required
-from models import db, User
+from app.models import db, User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -29,7 +29,7 @@ def login():
                 next = request.args.get('next')
                 return redirect(next or url_for('index'))
         flash('Введены неверные логин и/или пароль.', 'danger')
-    return render_template('auth/login.html')
+    return render_template('login.html')
 
 @bp.route('/logout')
 @login_required
