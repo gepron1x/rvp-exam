@@ -81,6 +81,9 @@ class Book(db.Model):
     pages: Mapped[int] = mapped_column(Integer, nullable=False)
     cover_id: Mapped[int] = mapped_column(ForeignKey("covers.id"))
 
+    rating_sum: Mapped[int] = mapped_column(default=0)
+    rating_num: Mapped[int] = mapped_column(default=0)
+
     cover: Mapped["Cover"] = relationship()
 
     genres: Mapped[List["Genre"]] = relationship(
@@ -88,6 +91,19 @@ class Book(db.Model):
         back_populates="books",
         lazy="selectin"
     )
+
+    reviews: Mapped[List["Review"]] = relationship(
+        "Review",
+        back_populates="book",
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
+
+    @property
+    def rating(self):
+        if self.rating_num > 0:
+            return self.rating_sum / self.rating_num
+        return 0
 
 class Review(db.Model):
     __tablename__ = 'reviews'

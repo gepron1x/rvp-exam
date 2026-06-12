@@ -14,3 +14,23 @@ main {
 footer {
     flex-shrink: 0;
 }
+
+.background-preview {
+    border: 3px dashed grey;
+    flex-grow: 1;
+}
+
+.title-area {
+    background-color: black;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+    font-size: 1.5rem;
+    min-height: calc(75vh);
+}
+
+.books-list .row:hover {
+    cursor: pointer;
+    border: 1px solid black !important;
+}

@@ -3,5 +3,61 @@
 {% block title %}Главная страница{% endblock %}
 
 {% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Список книг</h1>
 
+    <div class="books-list row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for book in books %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                {% if book.cover %}
+                <img src="{{ url_for('static', filename='uploads/covers/' + book.cover.file_name) }}"
+                     class="card-img-top"
+                     alt="Обложка книги {{ book.title }}"
+                     style="height: 300px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                     style="height: 300px;">
+                    <span class="text-white">Нет обложки</span>
+                </div>
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+
+                    <p class="card-text">
+                        <strong>Год:</strong> {{ book.year }}
+                    </p>
+
+                    <p class="card-text">
+                        <strong>Жанр(ы):</strong><br>
+                        {% for genre in book.genres %}
+                            <span class="badge bg-secondary">{{ genre.name }}</span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endfor %}
+                    </p>
+
+                    <p class="card-text">
+                        <strong>Средняя оценка:</strong>
+                        {{ book.rating }}
+                    </p>
+
+                    <p class="card-text">
+                        <strong>Количество рецензий:</strong>
+                        {{ book.rating_num }}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('book.detail', book_id=book.id) }}" class="btn btn-primary btn-sm">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <p class="text-muted">Книги не найдены.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
