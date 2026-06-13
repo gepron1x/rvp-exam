@@ -99,6 +99,50 @@ class Book(db.Model):
         lazy="selectin"
     )
 
+    def add_review(self, user_id: int, rating: int, text: str = ""):
+
+        stmt = db.select(Review).where(
+            Review.book_id == self.id,
+            Review.user_id == user_id
+        )
+        existing_review = db.session.execute(stmt).scalar_one_or_none()
+
+        if existing_review:
+            raise ValueError("Пользователь уже оставил отзыв на эту книгу")
+
+        review = Review(
+            book_id=self.id,
+            user_id=user_id,
+            rating=rating,
+            text=text
+        )
+
+        self.rating_sum += rating
+        self.rating_num += 1
+        db.session.add(review)
+        db.session.flush()
+
+        return review
+
+    def remove_review(self, review: "Review"):
+        if review.book_id != self.id:
+            raise ValueError("Отзыв не принадлежит этой книге")
+
+        self.rating_sum -= review.rating
+        self.rating_num -= 1
+        db.session.delete(review)
+        db.session.flush()
+
+        return review
+
+    def remove_review_by_id(self, review_id: int):
+        stmt = db.select(Review).where(Review.id == review_id)
+        review = db.session.execute(stmt).scalar_one_or_none()
+        if not review:
+            return
+        self.remove_review(review)
+
+
     @property
     def rating(self):
         if self.rating_num > 0:
