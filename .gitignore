@@ -185,3 +185,5 @@ fabric.properties
 # .idea
 
 cookies.txt
+
+/app/static/upload/

@@ -27,7 +27,7 @@ def login():
                 login_user(user)
                 flash('Вы успешно аутентифицированы.', 'success')
                 next = request.args.get('next')
-                return redirect(next or url_for('index'))
+                return redirect(next or url_for('main.index'))
         flash('Введены неверные логин и/или пароль.', 'danger')
     return render_template('login.html')
 
@@ -35,4 +35,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="row">
+        <div class="col-lg-4 col-md-5 text-center text-md-start mb-4">
+            {% if book.cover %}
+                <img src="{{ book.cover.url }}"
+                     alt="{{ book.title }}"
+                     class="book-cover img-fluid mb-4">
+            {% else %}
+                <div class="bg-light border rounded p-5 mb-4">
+                    <i class="bi bi-book fs-1 text-secondary"></i>
+                    <p class="mt-3 mb-0 text-muted">Обложка отсутствует</p>
+                </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Информация о книге</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><strong>Год издания:</strong> {{ book.year }}</li>
+                        <li class="mb-2"><strong>Издательство:</strong> {{ book.publisher }}</li>
+                        <li class="mb-2"><strong>Страниц:</strong> {{ book.pages }}</li>
+                        <li class="mb-3">
+                            <strong>Рейтинг:</strong>
+                            <span class="fw-bold text-warning fs-5">{{ "%.2f"|format(book.rating) }}</span>
+                            <small class="text-muted">({{ book.rating_num }} оценок)</small>
+                        </li>
+                        <li>
+                            <strong>Жанры:</strong><br>
+                            {% for genre in book.genres %}
+                                <span class="badge bg-primary me-1 mb-1">{{ genre.name }}</span>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-md-7">
+            <h1 class="mb-4">{{ book.title }}</h1>
+            <h3 class="mb-4">Описание</h3>
+            <div class="markdown-content mb-5">
+
+                {{ book_description_html|safe }}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h3 class="mb-4">Рецензии ({{ reviews|length }})</h3>
+
+        {% if user_can_review %}
+        <div class="text-center mb-4">
+            <a href=""
+               class="btn btn-primary btn-lg">
+                Написать рецензию
+            </a>
+        </div>
+        {% endif %}
+
+        {% if reviews %}
+            {% for review in reviews %}
+                <div class="card review-card mb-4 {% if user_review and user_review.id == review.id %}border-primary{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <strong class="text-primary">{{ review.user.full_name }}</strong>
+                                <small class="text-muted ms-2">
+                                    • {{ review.created_at.strftime('%d.%m.%Y %H:%M') }}
+                                </small>
+                            </div>
+                            <span class="badge bg-warning text-dark fs-6">
+                                {{ review.rating }} —
+                                {{ {
+                                    5: 'Отлично', 4: 'Хорошо', 3: 'Удовлетворительно',
+                                    2: 'Неудовлетворительно', 1: 'Плохо', 0: 'Ужасно'
+                                }[review.rating] }}
+                            </span>
+                        </div>
+
+                        <div class="review-content">
+                            {{ render_markdown(review.text)|safe }}
+                        </div>
+
+                        {% if user_review and user_review.id == review.id %}
+                        <div class="alert alert-info mt-3 mb-0 small">
+                            <i class="bi bi-check-circle"></i> Это ваша рецензия
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card bg-light text-center py-5">
+                <div class="card-body">
+                    <p class="fs-5 mb-2">Пока нет рецензий на эту книгу</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+{% endblock %}

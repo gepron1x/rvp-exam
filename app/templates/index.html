@@ -4,14 +4,22 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Список книг</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Список книг</h1>
+
+        {% if check_role('Администратор') %}
+        <a href="{{ url_for('book.create') }}" class="btn btn-success">
+            <i class="bi bi-plus-lg"></i> Добавить книгу
+        </a>
+        {% endif %}
+    </div>
 
     <div class="books-list row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for book in books %}
         <div class="col">
             <div class="card h-100 shadow-sm">
                 {% if book.cover %}
-                <img src="{{ url_for('static', filename='uploads/covers/' + book.cover.file_name) }}"
+                <img src="{{ book.cover.url }}"
                      class="card-img-top"
                      alt="Обложка книги {{ book.title }}"
                      style="height: 300px; object-fit: cover;">
@@ -40,16 +48,38 @@
 
                     <p class="card-text">
                         <strong>Средняя оценка:</strong>
-                        {{ book.rating }}
+                        <span class="fw-bold text-warning">{{ "%.2f"|format(book.rating) }}</span>
                     </p>
 
                     <p class="card-text">
-                        <strong>Количество рецензий:</strong>
-                        {{ book.rating_num }}
+                        <strong>Рецензий:</strong> {{ book.rating_num }}
                     </p>
                 </div>
+
                 <div class="card-footer bg-transparent">
-                    <a href="{{ url_for('book.detail', book_id=book.id) }}" class="btn btn-primary btn-sm">Подробнее</a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('book.detail', book_id=book.id) }}"
+                           class="btn btn-primary btn-sm flex-grow-1">
+                            Подробнее
+                        </a>
+
+                        {% if check_role('Модератор') %}
+                        <a href="{{ url_for('book.edit', book_id=book.id) }}"
+                           class="btn btn-warning btn-sm">
+                            <img src="{{ url_for('static', filename='images/icon/edit.svg') }}" class="icon" alt="Редактировать"/>
+                        </a>
+                        {% endif %}
+                        {% if check_role('Администратор') %}
+                        <button type="button"
+                                class="btn btn-danger btn-sm delete-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                data-book-id="{{ book.id }}"
+                                data-book-title="{{ book.title }}">
+                            <img src="{{ url_for('static', filename='images/icon/delete.svg') }}" class="icon" alt="Удалить"/>
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -60,4 +90,43 @@
         {% endfor %}
     </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы действительно хотите удалить книгу <strong id="modal-book-title"></strong>?</p>
+                <p class="text-danger"><small>Это действие нельзя отменить.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    {{ form.csrf_token if form else '' }}
+                    <button type="submit" class="btn btn-danger">Удалить книгу</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const deleteModal = document.getElementById('deleteModal');
+
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const bookId = button.getAttribute('data-book-id');
+        const bookTitle = button.getAttribute('data-book-title');
+
+        document.getElementById('modal-book-title').textContent = bookTitle;
+        const form = document.getElementById('deleteForm');
+        form.action = `/book/delete/${bookId}`;
+    });
+</script>
 {% endblock %}

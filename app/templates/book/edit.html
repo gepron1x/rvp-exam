@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "book/_book_form.html" import book_form %}
+
+{% block title %}Редактирование книги{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Редактирование книги: {{ book.title }}</h2>
+                </div>
+                <div class="card-body">
+                    {{ book_form(
+                        form,
+                        form_action=url_for('book.edit', book_id=book.id),
+                        book=book,
+                        genres=genres if genres else [],
+                        is_edit=True
+                    ) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.current-cover {
+    text-align: center;
+    margin-top: 10px;
+}
+.book-cover-preview {
+    max-width: 200px;
+    max-height: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('description')
+    });
+</script>
+{% endblock %}

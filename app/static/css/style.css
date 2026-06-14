@@ -34,3 +34,33 @@ footer {
     cursor: pointer;
     border: 1px solid black !important;
 }
+
+.book-cover {
+    max-width: 260px;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: block;
+    margin: 0 auto;
+}
+
+.info-card {
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+.markdown-content {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.review-card {
+    border-left: 4px solid #007bff;
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+}

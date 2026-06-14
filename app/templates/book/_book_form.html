@@ -1,0 +1,145 @@
+{% macro book_form(form, form_action, book=None, genres=None, is_edit=False) %}
+<form method="POST" action="{{ form_action }}" enctype="{% if not is_edit %}multipart/form-data{% endif %}">
+    {{ form.csrf_token }}
+
+    <div class="form-group">
+        <label for="title">Название книги *</label>
+        <input type="text"
+               id="title"
+               name="title"
+               class="form-control"
+               value="{{ book.title if book else '' }}"
+               required>
+        {% if form.title.errors %}
+            {% for error in form.title.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="description">Описание *</label>
+        <textarea id="description"
+                  name="description"
+                  class="form-control"
+                  rows="6">{{ book.description if book else '' }}</textarea>
+        {% if form.description.errors %}
+            {% for error in form.description.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="year">Год издания *</label>
+            <input type="number"
+                   id="year"
+                   name="year"
+                   class="form-control"
+                   value="{{ book.year if book else '' }}"
+                   min="1000"
+                   max="{{ current_year }}"
+                   required>
+            {% if form.year.errors %}
+                {% for error in form.year.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="publisher">Издательство *</label>
+            <input type="text"
+                   id="publisher"
+                   name="publisher"
+                   class="form-control"
+                   value="{{ book.publisher if book else '' }}"
+                   required>
+            {% if form.publisher.errors %}
+                {% for error in form.publisher.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="pages">Количество страниц *</label>
+            <input type="number"
+                   id="pages"
+                   name="pages"
+                   class="form-control"
+                   value="{{ book.pages if book else '' }}"
+                   min="1"
+                   required>
+            {% if form.pages.errors %}
+                {% for error in form.pages.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="genres">Жанры *</label>
+        <select id="genres"
+                name="genres"
+                class="form-control"
+                multiple
+                size="5"
+                required>
+            {% for genre in genres %}
+                <option value="{{ genre.id }}"
+                        {% if book and genre in book.genres %}selected{% endif %}>
+                    {{ genre.name }}
+                </option>
+            {% endfor %}
+        </select>
+        <small class="form-text text-muted">Удерживайте Ctrl (Cmd на Mac) для выбора нескольких жанров</small>
+        {% if form.genres.errors %}
+            {% for error in form.genres.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {% if not is_edit %}
+    <div class="form-group">
+        <label for="cover">Обложка книги *</label>
+        <input type="file"
+               id="cover"
+               name="cover"
+               class="form-control-file"
+               accept="image/jpeg,image/png,image/gif"
+               required>
+        <small class="form-text text-muted">
+            Поддерживаемые форматы: JPEG, PNG, GIF. Максимальный размер: 5MB
+        </small>
+        {% if form.cover.errors %}
+            {% for error in form.cover.errors %}
+                <span class="error">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% else %}
+        {% if book and book.cover %}
+        <div class="form-group">
+            <label>Текущая обложка</label>
+            <div class="current-cover">
+                <img src="{{ book.cover.url }}"
+                     alt="Обложка книги"
+                     class="book-cover-preview">
+                <p class="text-muted">Обложка не подлежит редактированию</p>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+            {% if is_edit %}Сохранить изменения{% else %}Создать книгу{% endif %}
+        </button>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+{% endmacro %}

@@ -1,6 +1,8 @@
 import os
 from typing import Optional, List
 from datetime import datetime
+
+from flask import url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -69,6 +71,10 @@ class Cover(db.Model):
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     mime: Mapped[str] = mapped_column(String(100), nullable=False)
     md5_hash: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    @property
+    def url(self):
+        return url_for('static', filename=os.path.join(f'upload/covers/{self.file_name}'))
 
 class Book(db.Model):
     __tablename__ = 'books'
