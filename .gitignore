@@ -187,3 +187,4 @@ fabric.properties
 cookies.txt
 
 /app/static/upload/
+/static_uploads/
