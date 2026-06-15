@@ -29,6 +29,14 @@
                     <a href="{{ url_for('collection.detail', collection_id=col.id) }}" class="btn btn-primary btn-sm">
                         Просмотр
                     </a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteCollectionModal"
+                            data-collection-id="{{ col.id }}"
+                            data-collection-name="{{ col.name }}">
+                        Удалить
+                    </button>
                 </td>
             </tr>
             {% endfor %}
@@ -37,6 +45,26 @@
     {% else %}
     <p class="text-muted">У вас пока нет подборок.</p>
     {% endif %}
+</div>
+
+<div class="modal fade" id="deleteCollectionModal" tabindex="-1" aria-labelledby="deleteCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCollectionModalLabel">Удаление подборки</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить подборку <strong id="deleteCollectionName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <form id="deleteCollectionForm" method="POST">
+                    <button type="submit" class="btn btn-danger">Да</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="newCollectionModal" tabindex="-1" aria-labelledby="newCollectionModalLabel" aria-hidden="true">
@@ -61,4 +89,15 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('deleteCollectionModal').addEventListener('show.bs.modal', function(event) {
+        const btn = event.relatedTarget;
+        document.getElementById('deleteCollectionName').textContent = btn.dataset.collectionName;
+        document.getElementById('deleteCollectionForm').action =
+            '/collections/' + btn.dataset.collectionId + '/delete';
+    });
+</script>
 {% endblock %}

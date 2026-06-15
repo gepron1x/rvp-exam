@@ -31,7 +31,7 @@ def role_required(required_role):
 
             if has_role_or_higher(current_user, required_role):
                 return f(*args, **kwargs)
-            flash("У вас недостаточно прав.", "danger")
+            flash("У вас недостаточно прав для выполнения данного действия.", "danger")
             return redirect(url_for('main.index'))
         return decorated_function
     return decorator

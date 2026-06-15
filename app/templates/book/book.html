@@ -83,13 +83,26 @@
                                     • {{ review.created_at.strftime('%d.%m.%Y %H:%M') }}
                                 </small>
                             </div>
-                            <span class="badge bg-warning text-dark fs-6">
-                                {{ review.rating }} —
-                                {{ {
-                                    5: 'Отлично', 4: 'Хорошо', 3: 'Удовлетворительно',
-                                    2: 'Неудовлетворительно', 1: 'Плохо', 0: 'Ужасно'
-                                }[review.rating] }}
-                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-warning text-dark fs-6">
+                                    {{ review.rating }} —
+                                    {{ {
+                                        5: 'Отлично', 4: 'Хорошо', 3: 'Удовлетворительно',
+                                        2: 'Неудовлетворительно', 1: 'Плохо', 0: 'Ужасно'
+                                    }[review.rating] }}
+                                </span>
+                                {% if check_role('Модератор') %}
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteReviewModal"
+                                        data-review-id="{{ review.id }}"
+                                        data-book-id="{{ book.id }}"
+                                        data-reviewer="{{ review.user.full_name }}">
+                                    Удалить
+                                </button>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <div class="review-content">
@@ -114,6 +127,28 @@
     </div>
 
 </div>
+{% if check_role('Модератор') %}
+<div class="modal fade" id="deleteReviewModal" tabindex="-1" aria-labelledby="deleteReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteReviewModalLabel">Удаление рецензии</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить рецензию пользователя <strong id="deleteReviewerName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                <form id="deleteReviewForm" method="POST">
+                    <button type="submit" class="btn btn-danger">Да</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% if check_role('Пользователь') %}
 <div class="modal fade" id="addToCollectionModal" tabindex="-1" aria-labelledby="addToCollectionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -153,4 +188,15 @@
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+<script>
+    const deleteReviewModal = document.getElementById('deleteReviewModal');
+    if (deleteReviewModal) {
+        deleteReviewModal.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget;
+            document.getElementById('deleteReviewerName').textContent = btn.dataset.reviewer;
+            document.getElementById('deleteReviewForm').action =
+                '/book/' + btn.dataset.bookId + '/review/' + btn.dataset.reviewId + '/delete';
+        });
+    }
+</script>
 {% endblock %}

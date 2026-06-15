@@ -52,6 +52,31 @@ def create():
 
     return redirect(url_for('collection.index'))
 
+@bp.route('/<int:collection_id>/delete', methods=['POST'])
+@login_required
+def delete(collection_id):
+    collection = db.session.execute(
+        db.select(Collection).where(
+            Collection.id == collection_id,
+            Collection.user_id == current_user.id
+        )
+    ).scalar_one_or_none()
+
+    if not collection:
+        flash('Подборка не найдена.', 'danger')
+        return redirect(url_for('collection.index'))
+
+    try:
+        name = collection.name
+        db.session.delete(collection)
+        db.session.commit()
+        flash(f'Подборка «{name}» успешно удалена.', 'success')
+    except Exception:
+        db.session.rollback()
+        flash('Ошибка при удалении подборки.', 'danger')
+
+    return redirect(url_for('collection.index'))
+
 
 @bp.route('/add_book', methods=['POST'])
 @login_required
