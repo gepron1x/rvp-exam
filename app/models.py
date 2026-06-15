@@ -178,6 +178,24 @@ class Review(db.Model):
     def html_text(self):
         return markdown.markdown(self.text)
 
+collection_book = Table(
+    'collection_book',
+    db.Model.metadata,
+    Column('collection_id', Integer, ForeignKey('collections.id', ondelete='CASCADE'), primary_key=True),
+    Column('book_id', Integer, ForeignKey('books.id', ondelete='CASCADE'), primary_key=True)
+)
 
 
+class Collection(db.Model):
+    __tablename__ = 'collections'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
+
+    user: Mapped["User"] = relationship()
+    books: Mapped[List["Book"]] = relationship(
+        secondary=collection_book,
+        lazy="selectin"
+    )
 

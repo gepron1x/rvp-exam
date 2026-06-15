@@ -54,6 +54,14 @@
     <div class="mt-5">
         <h3 class="mb-4">Рецензии ({{ reviews|length }})</h3>
 
+        {% if check_role('Пользователь') %}
+        <div class="mb-4">
+            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#addToCollectionModal">
+                Добавить в подборку
+            </button>
+        </div>
+        {% endif %}
+
         {% if user_can_review %}
         <div class="text-center mb-4">
             <a href="{{ url_for('review.create', book_id=book.id) }}"
@@ -105,6 +113,41 @@
     </div>
 
 </div>
+{% if check_role('Пользователь') %}
+<div class="modal fade" id="addToCollectionModal" tabindex="-1" aria-labelledby="addToCollectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addToCollectionModalLabel">Добавить в подборку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('collection.add_book') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    {% if user_collections %}
+                    <div class="mb-3">
+                        <label for="collectionSelect" class="form-label">Выберите подборку</label>
+                        <select class="form-select" id="collectionSelect" name="collection_id" required>
+                            {% for col in user_collections %}
+                            <option value="{{ col.id }}">{{ col.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">У вас пока нет подборок. <a href="{{ url_for('collection.index') }}">Создайте подборку</a>.</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    {% if user_collections %}
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}

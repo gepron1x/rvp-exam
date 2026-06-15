@@ -9,7 +9,7 @@ from sqlalchemy import select
 
 from app.extensions import db
 from app.forms.book_form import BookForm
-from app.models import Book, Genre, Review
+from app.models import Book, Genre, Review, Collection
 from app.cover_upload import create_cover, save_cover, delete_cover, delete_file
 from app.roles import role_required
 from app.roles import ADMIN, MODERATOR
@@ -75,6 +75,7 @@ def detail(book_id: int):
 
     user_review = None
     user_can_review = False
+    user_collections = []
 
     if current_user.is_authenticated:
         stmt_user_review = db.select(Review).where(
@@ -82,8 +83,11 @@ def detail(book_id: int):
             Review.user_id == current_user.id
         )
         user_review = db.session.execute(stmt_user_review).scalar_one_or_none()
-
         user_can_review = user_review is None
+
+        user_collections = db.session.execute(
+            db.select(Collection).where(Collection.user_id == current_user.id)
+        ).scalars().all()
 
     book_description_html = markdown.markdown(book.description)
 
@@ -92,7 +96,8 @@ def detail(book_id: int):
                            reviews=reviews,
                            user_review=user_review,
                            user_can_review=user_can_review,
-                           book_description_html=book_description_html)
+                           book_description_html=book_description_html,
+                           user_collections=user_collections)
 
 @bp.route("/<int:book_id>/edit", methods=['GET', 'POST'])
 @role_required(MODERATOR)

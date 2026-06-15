@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Подборка: {{ collection.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-4">
+        <a href="{{ url_for('collection.index') }}" class="btn btn-outline-secondary btn-sm mb-3">← Мои подборки</a>
+        <h1>{{ collection.name }}</h1>
+    </div>
+
+    {% if collection.books %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for book in collection.books %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                {% if book.cover %}
+                <img src="{{ book.cover.url }}" class="card-img-top" alt="{{ book.title }}" style="height: 250px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <span class="text-white">Нет обложки</span>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text"><strong>Год:</strong> {{ book.year }}</p>
+                    <p class="card-text">
+                        <strong>Жанр(ы):</strong><br>
+                        {% for genre in book.genres %}
+                            <span class="badge bg-secondary">{{ genre.name }}</span>
+                        {% endfor %}
+                    </p>
+                    <p class="card-text">
+                        <strong>Средняя оценка:</strong>
+                        <span class="fw-bold text-warning">{{ "%.2f"|format(book.rating) }}</span>
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('book.detail', book_id=book.id) }}" class="btn btn-primary btn-sm w-100">
+                        Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted">В этой подборке пока нет книг.</p>
+    {% endif %}
+</div>
+{% endblock %}
