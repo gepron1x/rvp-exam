@@ -2,6 +2,7 @@ import os
 from typing import Optional, List
 from datetime import datetime
 
+import markdown
 from flask import url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
@@ -155,6 +156,10 @@ class Book(db.Model):
             return self.rating_sum / self.rating_num
         return 0
 
+    @property
+    def html_description(self):
+        return markdown.markdown(self.description)
+
 class Review(db.Model):
     __tablename__ = 'reviews'
 
@@ -168,6 +173,10 @@ class Review(db.Model):
 
     book: Mapped["Book"] = relationship()
     user: Mapped["User"] = relationship()
+
+    @property
+    def html_text(self):
+        return markdown.markdown(self.text)
 
 
 

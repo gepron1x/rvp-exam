@@ -56,7 +56,7 @@
 
         {% if user_can_review %}
         <div class="text-center mb-4">
-            <a href=""
+            <a href="{{ url_for('review.create', book_id=book.id) }}"
                class="btn btn-primary btn-lg">
                 Написать рецензию
             </a>
@@ -84,7 +84,7 @@
                         </div>
 
                         <div class="review-content">
-                            {{ render_markdown(review.text)|safe }}
+                            {{ review.html_text|safe }}
                         </div>
 
                         {% if user_review and user_review.id == review.id %}

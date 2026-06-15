@@ -77,7 +77,7 @@ def detail(book_id: int):
     user_can_review = False
 
     if current_user.is_authenticated:
-        stmt_user_review = select(Review).where(
+        stmt_user_review = db.select(Review).where(
             Review.book_id == book_id,
             Review.user_id == current_user.id
         )
@@ -94,7 +94,7 @@ def detail(book_id: int):
                            user_can_review=user_can_review,
                            book_description_html=book_description_html)
 
-@bp.route("/edit/<int:book_id>", methods=['GET', 'POST'])
+@bp.route("/<int:book_id>/edit", methods=['GET', 'POST'])
 @role_required(MODERATOR)
 def edit(book_id: int):
     stmt = db.select(Book).where(Book.id == book_id)
@@ -135,7 +135,7 @@ def edit(book_id: int):
     genres = db.session.execute(db.select(Genre)).scalars().all()
     return render_template('book/edit.html', form=form, book=book, genres=genres)
 
-@bp.route("/delete/<int:book_id>", methods=['POST'])
+@bp.route("/<int:book_id>/delete", methods=['POST'])
 @role_required(ADMIN)
 def delete(book_id: int):
     stmt = db.select(Book).where(Book.id == book_id)
@@ -158,7 +158,6 @@ def delete(book_id: int):
     except Exception as e:
         db.session.rollback()
         flash(f'Ошибка при удалении книги: {e}', 'danger')
-        raise e
         return redirect(url_for('main.index'))
 
 
