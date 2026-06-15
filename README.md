@@ -5,7 +5,16 @@
 ## Запуск приложения
 
 ```bash
-docker-compose up
+docker compose up
+```
+
+Либо в venv:
+
+```bash
+pip install -r requirements.txt
+flask db upgrade
+python init_db.py
+python run.py
 ```
 
 ## Пользователи
