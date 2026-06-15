@@ -32,6 +32,7 @@ def create():
 
             book = Book(
                 title=form.title.data,
+                author=form.author.data,
                 description=clean_text(form.description.data),
                 year=form.year.data,
                 publisher=form.publisher.data,
@@ -114,6 +115,7 @@ def edit(book_id: int):
     if form.validate_on_submit():
         try:
             book.title = form.title.data
+            book.author = form.author.data
             book.description = clean_text(form.description.data)
             book.year = form.year.data
             book.publisher = form.publisher.data
